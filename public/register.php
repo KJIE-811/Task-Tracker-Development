@@ -1,10 +1,16 @@
 <?php
 session_start();
 include 'db.php';
+include 'csrf.php';
 
 $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // Validate CSRF token
+    $csrf_token = $_POST['csrf_token'] ?? '';
+    if (!validateCSRFToken($csrf_token)) {
+        $message = "Security validation failed. Please try again.";
+    } else {
     $name = $_POST['name'] ?? '';
     $email = $_POST['email'] ?? '';
     $username = $_POST['username'] ?? '';
@@ -31,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
             // Insert user
-            $insert_sql = "INSERT INTO users (name, email, username, password) VALUES (?, ?, ?, ?)";
+            $insert_sql = "INSERT INTO users (name, email, username, password_hash) VALUES (?, ?, ?, ?)";
             $stmt = $conn->prepare($insert_sql);
             $stmt->bind_param("ssss", $name, $email, $username, $hashed_password);
 
@@ -43,6 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         }
         $stmt->close();
+    }
     }
 }
 ?>
@@ -130,6 +137,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <?php endif; ?>
 
     <form method="POST">
+        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCSRFToken()); ?>">
+        
         <div class="form-group">
             <label for="name">Full Name:</label>
             <input type="text" id="name" name="name" required>
