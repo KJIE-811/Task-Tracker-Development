@@ -1,14 +1,14 @@
--- Database schema placeholder for Task Tracker
--- Update and run migrations as needed
+-- Database schema for Task Tracker
 
 -- users table
--- CREATE TABLE users (
---   id INT AUTO_INCREMENT PRIMARY KEY,
---   username VARCHAR(100) NOT NULL UNIQUE,
---   email VARCHAR(255) NOT NULL UNIQUE,
---   password_hash VARCHAR(255) NOT NULL,
---   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
--- );
+CREATE TABLE IF NOT EXISTS users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  username VARCHAR(100) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 -- tasks table
 -- CREATE TABLE tasks (
