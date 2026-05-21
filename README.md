@@ -8,7 +8,7 @@ This is a web application designed to help users manage and track their tasks ef
 
 - CHOW KAI JIE BAI_A2009F-2509001
 - CHEW SEE YUAN BIT_A2201F-2509002
-- ALI
+- GUO RUNTING BDS_B2201F-2505001
 
 ## Technologies Used
 
