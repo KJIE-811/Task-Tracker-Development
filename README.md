@@ -10,6 +10,14 @@ This is a web application designed to help users manage and track their tasks ef
 - CHEW SEE YUAN BIT_A2201F-2509002
 - GUO RUNTING BDS_B2201F-2505001
 
+## Team Members Role
+
+| Role | Team Member | Responsibilities |
+|------|-------------|------------------|
+| Product Owner & Scrum Master | CHOW KAI JIE | Identify the purpose of application, document README file, ,build the application structure, decide the languages, database and server use, plan for the iteration and guide team member about GitHub |
+| Developer 1 | CHEW SEE YUAN | TBC |
+| Developer 2 | GUO RUNTING | TBC |
+
 ## Technologies Used
 
 The project is built using the following technologies:
@@ -71,6 +79,17 @@ This project uses **XAMPP** to provide a local development environment with Apac
 3. Navigate to `http://localhost/Task-Tracker-Development/` in your browser
 4. Start tracking your tasks!
 
+## Project Structure
+
+```
+Task-Tracker-Development/
+├── public/          # Publicly accessible files (login, register, dashboard, etc.)
+├── src/             # Source code and utilities
+├── database/        # Database schema
+├── docs/            # Documentation
+└── tests/           # Test files
+```
+
 ## SCRUM Development Iterations
 
 ### Iteration 1: Week 1 (18/5 - 22/5)
@@ -89,17 +108,6 @@ This project uses **XAMPP** to provide a local development environment with Apac
 ### Iteration 3: Week 3 (1/6 - 5/6)
 **Deployment**
 - Run Full Application to avoid bugs
-
-## Project Structure
-
-```
-Task-Tracker-Development/
-├── public/          # Publicly accessible files (login, register, dashboard, etc.)
-├── src/             # Source code and utilities
-├── database/        # Database schema
-├── docs/            # Documentation
-└── tests/           # Test files
-```
 
 ## Features
 **Core Feature 1**
