@@ -15,8 +15,8 @@ This is a web application designed to help users manage and track their tasks ef
 | Role | Team Member | Responsibilities |
 |------|-------------|------------------|
 | Product Owner & Scrum Master | CHOW KAI JIE | Identify the purpose of application, document README file, ,build the application structure, decide the languages, database and server use, plan for the iteration and guide team member about GitHub |
-| Developer 1 | CHEW SEE YUAN | TBC |
-| Developer 2 | GUO RUNTING | TBC |
+| Developer 1 | CHEW SEE YUAN | Develop application function, create task, edit task, delete task |
+| Developer 2 | GUO RUNTING | Develop application UIUX, task listing |
 
 ## Technologies Used
 
