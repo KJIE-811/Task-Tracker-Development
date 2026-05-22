@@ -17,7 +17,7 @@ if ($conn->connect_error) {
 $db_name = "task_tracker";
 $sql = "CREATE DATABASE IF NOT EXISTS " . $db_name;
 if ($conn->query($sql) === TRUE) {
-    echo "Database created successfully or already exists.<br>";
+    // Database created successfully or already exists
 } else {
     echo "Error creating database: " . $conn->error;
 }
@@ -26,12 +26,10 @@ if ($conn->query($sql) === TRUE) {
 $conn->select_db($db_name);
 
 // Import SQL file
-$sql_file = file_get_contents(__DIR__ . '/database/schema.sql');
+$sql_file = file_get_contents(__DIR__ . '/../database/schema.sql');
 if ($conn->multi_query($sql_file) === TRUE) {
-    echo "Tables created successfully!";
+    // Tables created successfully
 } else {
     echo "Error creating tables: " . $conn->error;
 }
-
-$conn->close();
 ?>

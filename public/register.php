@@ -11,45 +11,66 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (!validateCSRFToken($csrf_token)) {
         $message = "Security validation failed. Please try again.";
     } else {
-    $name = $_POST['name'] ?? '';
-    $email = $_POST['email'] ?? '';
-    $username = $_POST['username'] ?? '';
-    $password = $_POST['password'] ?? '';
-    $confirm_password = $_POST['confirm_password'] ?? '';
+        $name = $_POST['name'] ?? '';
+        $email = $_POST['email'] ?? '';
+        $username = $_POST['username'] ?? '';
+        $password = $_POST['password'] ?? '';
+        $confirm_password = $_POST['confirm_password'] ?? '';
 
-    // Validation
-    if (empty($name) || empty($email) || empty($username) || empty($password)) {
-        $message = "All fields are required!";
-    } elseif ($password !== $confirm_password) {
-        $message = "Passwords do not match!";
-    } else {
-        // Check if username or email already exists
-        $check_sql = "SELECT * FROM users WHERE username = ? OR email = ?";
-        $stmt = $conn->prepare($check_sql);
-        $stmt->bind_param("ss", $username, $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result->num_rows > 0) {
-            $message = "Username or email already exists!";
+        // Validation
+        if (empty($name) || empty($email) || empty($username) || empty($password)) {
+            $message = "All fields are required!";
+        } elseif ($password !== $confirm_password) {
+            $message = "Passwords do not match!";
         } else {
-            // Hash password
-            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-
-            // Insert user
-            $insert_sql = "INSERT INTO users (name, email, username, password_hash) VALUES (?, ?, ?, ?)";
-            $stmt = $conn->prepare($insert_sql);
-            $stmt->bind_param("ssss", $name, $email, $username, $hashed_password);
-
-            if ($stmt->execute()) {
-                $message = "Registration successful! Redirecting to login...";
-                header("refresh:2;url=login.php");
+            // Clear any pending results
+            while ($conn->next_result()) {
+                if ($res = $conn->use_result()) {
+                    $res->free();
+                }
+            }
+            
+            // Check if username or email already exists
+            $check_sql = "SELECT * FROM users WHERE username = ? OR email = ?";
+            $stmt = $conn->prepare($check_sql);
+            
+            if ($stmt === false) {
+                $message = "Database error: " . $conn->error;
             } else {
-                $message = "Error: " . $stmt->error;
+                $stmt->bind_param("ss", $username, $email);
+                $stmt->execute();
+                $result = $stmt->get_result();
+
+                if ($result->num_rows > 0) {
+                    $message = "Username or email already exists!";
+                } else {
+                    // Clear pending results before next query
+                    $result->free();
+                    
+                    // Hash password
+                    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+                    // Insert user
+                    $insert_sql = "INSERT INTO users (name, email, username, password_hash) VALUES (?, ?, ?, ?)";
+                    $insert_stmt = $conn->prepare($insert_sql);
+                    
+                    if ($insert_stmt === false) {
+                        $message = "Database error: " . $conn->error;
+                    } else {
+                        $insert_stmt->bind_param("ssss", $name, $email, $username, $hashed_password);
+
+                        if ($insert_stmt->execute()) {
+                            $message = "Registration successful! Redirecting to login...";
+                            header("refresh:2;url=login.php");
+                        } else {
+                            $message = "Error: " . $insert_stmt->error;
+                        }
+                        $insert_stmt->close();
+                    }
+                }
+                $stmt->close();
             }
         }
-        $stmt->close();
-    }
     }
 }
 ?>

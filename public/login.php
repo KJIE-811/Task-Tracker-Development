@@ -18,33 +18,45 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (empty($username) || empty($password)) {
             $message = "Username and password are required!";
         } else {
+            // Clear any pending results
+            while ($conn->next_result()) {
+                if ($res = $conn->use_result()) {
+                    $res->free();
+                }
+            }
+            
             // Select user query to check validation
             $select_sql = "SELECT id, name, username, password_hash FROM users WHERE username = ?";
             $stmt = $conn->prepare($select_sql);
-            $stmt->bind_param("s", $username);
-            $stmt->execute();
-            $result = $stmt->get_result();
-
-            if ($result->num_rows == 1) {
-                $user = $result->fetch_assoc();
-
-                // Verify password
-                if (password_verify($password, $user['password_hash'])) {
-                    // Store user info in session
-                    $_SESSION['user_id'] = $user['id'];
-                    $_SESSION['username'] = $user['username'];
-                    $_SESSION['name'] = $user['name'];
-
-                    $stmt->close();
-                    header("Location: dashboard.php");
-                    exit;
-                } else {
-                    $message = "Invalid username or password!";
-                }
+            
+            if ($stmt === false) {
+                $message = "Database error: " . $conn->error;
             } else {
-                $message = "User not found!";
+                $stmt->bind_param("s", $username);
+                $stmt->execute();
+                $result = $stmt->get_result();
+
+                if ($result->num_rows == 1) {
+                    $user = $result->fetch_assoc();
+
+                    // Verify password
+                    if (password_verify($password, $user['password_hash'])) {
+                        // Store user info in session
+                        $_SESSION['user_id'] = $user['id'];
+                        $_SESSION['username'] = $user['username'];
+                        $_SESSION['name'] = $user['name'];
+
+                        $stmt->close();
+                        header("Location: index.php");
+                        exit;
+                    } else {
+                        $message = "Invalid username or password!";
+                    }
+                } else {
+                    $message = "User not found!";
+                }
+                $stmt->close();
             }
-            $stmt->close();
         }
     }
 }
