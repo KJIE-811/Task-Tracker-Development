@@ -31,6 +31,9 @@ if (!isset($_SESSION['user_id'])) {
         .logout {
             margin-top: 20px;
         }
+        .create_task {
+            margin-top: 20px;
+        }
         a {
             display: inline-block;
             padding: 10px 20px;
@@ -49,6 +52,10 @@ if (!isset($_SESSION['user_id'])) {
         <h1>Welcome, <?php echo htmlspecialchars($_SESSION['name']); ?>!</h1>
         <p>You are successfully logged in.</p>
         <p>Username: <?php echo htmlspecialchars($_SESSION['username']); ?></p>
+
+        <div class="create_task">
+            <a href="Task_create.php">create task</a>
+        </div>
 
         <div class="logout">
             <a href="logout.php">Logout</a>
