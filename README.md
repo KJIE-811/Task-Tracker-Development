@@ -10,6 +10,14 @@ This is a web application designed to help users manage and track their tasks ef
 - CHEW SEE YUAN BIT_A2201F-2509002
 - GUO RUNTING BDS_B2201F-2505001
 
+## Team Members Role
+
+| Role | Team Member | Responsibilities |
+|------|-------------|------------------|
+| Product Owner & Scrum Master | CHOW KAI JIE | Identify the purpose of application, document README file, ,build the application structure, decide the languages, database and server use, plan for the iteration and guide team member about GitHub |
+| Developer 1 | CHEW SEE YUAN | Develop application function, create task, edit task, delete task |
+| Developer 2 | GUO RUNTING | Develop application UIUX, task listing |
+
 ## Technologies Used
 
 The project is built using the following technologies:
@@ -82,11 +90,36 @@ Task-Tracker-Development/
 └── tests/           # Test files
 ```
 
-## Features
+## SCRUM Development Iterations
 
-- User registration and login
-- Create and manage tasks
-- Track task progress
-- Organize tasks by priority
+### Iteration 1: Week 1 (18/5 - 22/5)
+**Setup Project**
+- Create GitHub Repo
+- Download and install XAMPP
+- Document README file
+- Setup Application Structure
+
+### Iteration 2: Week 2 (25/5 - 29/5)
+**CRUD Features**
+- Add, Edit, Delete Task
+- UI/UX Design
+- Testing and Bugs Fixing
+
+### Iteration 3: Week 3 (1/6 - 5/6)
+**Deployment**
+- Run Full Application to avoid bugs
+
+## Features
+**Core Feature 1**
+Task Management
+- Create Task
+- Edit Task
+- Delete Task
+- View Task List
+
+**Supporting Feature**
+User Authentication
+- Login
+- Register
 
 ---
