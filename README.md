@@ -71,6 +71,25 @@ This project uses **XAMPP** to provide a local development environment with Apac
 3. Navigate to `http://localhost/Task-Tracker-Development/` in your browser
 4. Start tracking your tasks!
 
+## SCRUM Development Iterations
+
+### Iteration 1: Week 1 (18/5 - 22/5)
+**Setup Project**
+- Create GitHub Repo
+- Download and install XAMPP
+- Document README file
+- Setup Application Structure
+
+### Iteration 2: Week 2 (25/5 - 29/5)
+**CRUD Features**
+- Add, Edit, Delete Task
+- UI/UX Design
+- Testing and Bugs Fixing
+
+### Iteration 3: Week 3 (1/6 - 5/6)
+**Deployment**
+- Run Full Application to avoid bugs
+
 ## Project Structure
 
 ```
@@ -83,10 +102,16 @@ Task-Tracker-Development/
 ```
 
 ## Features
+**Core Feature 1**
+Task Management
+- Create Task
+- Edit Task
+- Delete Task
+- View Task List
 
-- User registration and login
-- Create and manage tasks
-- Track task progress
-- Organize tasks by priority
+**Supporting Feature**
+User Authentication
+- Login
+- Register
 
 ---
