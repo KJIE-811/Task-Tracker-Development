@@ -1,7 +1,6 @@
 <?php
 session_start();
 include 'db.php';
-include 'csrf.php';
 
 http_response_code(200);
 header('Content-Type: text/html; charset=utf-8');
@@ -11,19 +10,21 @@ $isLoggedIn = isset($_SESSION['user_id']);
 $tasks = [];
 
 if ($isLoggedIn) {
-    // Clear any pending results
-    while ($conn->next_result()) {
-        if ($res = $conn->use_result()) {
-            $res->free();
-        }
-    }
-    
-    // Fetch user's tasks
+    // Fetch user's tasks using prepared statement
     $user_id = $_SESSION['user_id'];
-    $result = $conn->query("SELECT * FROM tasks WHERE user_id = $user_id ORDER BY created_at DESC");
+    $stmt = $conn->prepare("SELECT * FROM tasks WHERE user_id = ? ORDER BY created_at DESC");
     
-    if ($result) {
-        $tasks = $result->fetch_all(MYSQLI_ASSOC);
+    if ($stmt === false) {
+        error_log('Database prepare error: ' . $conn->error);
+    } else {
+        $stmt->bind_param("i", $user_id);
+        if ($stmt->execute()) {
+            $result = $stmt->get_result();
+            $tasks = $result->fetch_all(MYSQLI_ASSOC);
+        } else {
+            error_log('Query execution error: ' . $stmt->error);
+        }
+        $stmt->close();
     }
 }
 ?>
@@ -217,7 +218,7 @@ if ($isLoggedIn) {
       <h1>📋 Task Tracker</h1>
       <div class="header-buttons">
         <?php if ($isLoggedIn): ?>
-          <a href="Task_create.php" class="btn btn-primary">+ Create Task</a>
+          <a href="task_create.php" class="btn btn-primary">+ Create Task</a>
           <a href="logout.php" class="btn btn-danger">Logout</a>
         <?php else: ?>
           <a href="login.php" class="btn btn-primary">Login</a>
@@ -250,15 +251,21 @@ if ($isLoggedIn) {
                 <tr>
                   <td><strong><?php echo htmlspecialchars($task['title']); ?></strong></td>
                   <td><?php echo htmlspecialchars(substr($task['description'] ?? '', 0, 50)); ?><?php echo (strlen($task['description'] ?? '') > 50) ? '...' : ''; ?></td>
-                  <td class="priority-<?php echo $task['priority']; ?>">
+                  <td class="priority-<?php echo htmlspecialchars((int)$task['priority'], ENT_QUOTES); ?>">
                     <?php 
                       $priorities = [1 => 'Low', 2 => 'Medium-Low', 3 => 'Medium', 4 => 'High', 5 => 'Critical'];
-                      echo $priorities[$task['priority']];
+                      $priorityValue = (int)$task['priority'];
+                      echo isset($priorities[$priorityValue]) ? $priorities[$priorityValue] : 'Unknown';
                     ?>
                   </td>
                   <td>
-                    <span class="status-<?php echo str_replace('_', '-', $task['status']); ?>">
-                      <?php echo ucfirst(str_replace('_', ' ', $task['status'])); ?>
+                    <?php
+                      $validStatuses = ['todo', 'in_progress', 'done'];
+                      $status = $task['status'] ?? 'todo';
+                      $statusClass = in_array($status, $validStatuses) ? str_replace('_', '-', $status) : 'todo';
+                    ?>
+                    <span class="status-<?php echo htmlspecialchars($statusClass, ENT_QUOTES); ?>">
+                      <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $status))); ?>
                     </span>
                   </td>
                   <td><?php echo $task['due_date'] ? date('M d, Y', strtotime($task['due_date'])) : '-'; ?></td>
@@ -269,7 +276,7 @@ if ($isLoggedIn) {
           </table>
         <?php else: ?>
           <div class="no-tasks">
-            <p>No tasks yet. <a href="Task_create.php">Create your first task!</a></p>
+            <p>No tasks yet. <a href="task_create.php">Create your first task!</a></p>
           </div>
         <?php endif; ?>
       </div>

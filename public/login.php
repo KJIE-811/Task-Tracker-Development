@@ -18,13 +18,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (empty($username) || empty($password)) {
             $message = "Username and password are required!";
         } else {
-            // Clear any pending results
-            while ($conn->next_result()) {
-                if ($res = $conn->use_result()) {
-                    $res->free();
-                }
-            }
-            
             // Select user query to check validation
             $select_sql = "SELECT id, name, username, password_hash FROM users WHERE username = ?";
             $stmt = $conn->prepare($select_sql);
@@ -50,10 +43,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         header("Location: index.php");
                         exit;
                     } else {
+                        error_log("Failed login attempt: Invalid password for username '" . htmlspecialchars($username) . "'");
                         $message = "Invalid username or password!";
                     }
                 } else {
-                    $message = "User not found!";
+                    error_log("Failed login attempt: Username '" . htmlspecialchars($username) . "' not found");
+                    $message = "Invalid username or password!";
                 }
                 $stmt->close();
             }

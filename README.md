@@ -53,9 +53,9 @@ The project is built using the following technologies:
      ```
 
 3. **Setup Database Tables**
-   - Open your browser and go to:
+   - Open your cmd and go to the folder:
      ```
-     http://localhost/Task-Tracker-Development/database/setup.php
+     C:\xampp\php\php.exe database/setup.php
      ```
    - This will create the database and all necessary tables automatically
    - You should see a success message confirming the database setup

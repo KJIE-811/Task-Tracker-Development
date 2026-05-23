@@ -23,13 +23,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         } elseif ($password !== $confirm_password) {
             $message = "Passwords do not match!";
         } else {
-            // Clear any pending results
-            while ($conn->next_result()) {
-                if ($res = $conn->use_result()) {
-                    $res->free();
-                }
-            }
-            
             // Check if username or email already exists
             $check_sql = "SELECT * FROM users WHERE username = ? OR email = ?";
             $stmt = $conn->prepare($check_sql);

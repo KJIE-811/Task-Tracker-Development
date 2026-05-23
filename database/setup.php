@@ -3,7 +3,15 @@
  * Database Setup Script
  * This script creates the database and tables for the Task Tracker application
  * Run this script once after cloning the repository to initialize the database
+ * 
+ * Usage: php database/setup.php
  */
+
+// Ensure this script only runs from CLI
+if (php_sapi_name() !== 'cli') {
+    http_response_code(403);
+    die("Error: This setup script can only be run from the command line (CLI).\n");
+}
 
 $servername = "localhost";
 $username = "root";
@@ -66,13 +74,13 @@ foreach ($statements as $statement) {
 }
 
 if ($success) {
-    echo "<h1 style='color: green;'>✓ Database and tables created successfully!</h1>";
-    echo "<p>The Task Tracker database is now ready to use.</p>";
-    echo "<p><a href='../public/index.php'>Go to Application</a></p>";
+    echo "✓ Database and tables created successfully!\n";
+    echo "The Task Tracker database is now ready to use.\n";
+    echo "Start the application by visiting: http://localhost/Task-Tracker-Development/public/index.php\n";
 } else {
-    echo "<h1 style='color: red;'>✗ Error creating database or tables</h1>";
+    echo "✗ Error creating database or tables\n";
     foreach ($errors as $error) {
-        echo "<p>Error: " . $error . "</p>";
+        echo "Error: " . $error . "\n";
     }
 }
 

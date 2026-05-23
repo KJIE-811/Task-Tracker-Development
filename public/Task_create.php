@@ -7,8 +7,9 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-// Include database connection
+// Include database connection and CSRF protection
 include 'db.php';
+include 'csrf.php';
 
 // Initialize variables
 $error = '';
@@ -16,81 +17,72 @@ $success = '';
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Get form data
-    $title = trim($_POST['title'] ?? '');
-    $description = trim($_POST['description'] ?? '');
-    $priority = (int)($_POST['priority'] ?? 3);
-    $due_date = $_POST['due_date'] ?? null;
-    $status = 'todo';
-    $user_id = $_SESSION['user_id'];
-
-    // Validate input
-    if (empty($title)) {
-        $error = 'Task title is required.';
-    } elseif (strlen($title) > 255) {
-        $error = 'Task title cannot exceed 255 characters.';
-    } elseif (strlen($description) > 1000) {
-        $error = 'Task description cannot exceed 1000 characters.';
-    } elseif ($priority < 1 || $priority > 5) {
-        $error = 'Priority must be between 1 and 5.';
-    } elseif (!empty($due_date) && strtotime($due_date) === false) {
-        $error = 'Invalid due date format.';
+    // Validate CSRF token
+    $csrf_token = $_POST['csrf_token'] ?? '';
+    if (!validateCSRFToken($csrf_token)) {
+        $error = 'Security validation failed. Please try again.';
     } else {
-        // Clear any pending results
-        while ($conn->next_result()) {
-            if ($res = $conn->use_result()) {
-                $res->free();
-            }
-        }
-        
-        // Verify user exists in database
-        $user_check = $conn->prepare("SELECT id FROM users WHERE id = ?");
-        $user_check->bind_param("i", $user_id);
-        $user_check->execute();
-        $user_result = $user_check->get_result();
-        
-        if ($user_result->num_rows === 0) {
-            $error = 'User not found in database. Please log in again.';
-            $user_check->close();
-        } else {
-            $user_check->close();
-            // Prepare and execute insert query
-            $stmt = $conn->prepare("INSERT INTO tasks (user_id, title, description, status, priority, due_date, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())");
-        
-            if ($stmt === false) {
-                $error = 'Database error: ' . $conn->error;
-            } else {
-                $stmt->bind_param(
-                    "isssis",
-                    $user_id,
-                    $title,
-                    $description,
-                    $status,
-                    $priority,
-                    $due_date
-                );
+        // Get form data
+        $title = trim($_POST['title'] ?? '');
+        $description = trim($_POST['description'] ?? '');
+        $priority = (int)($_POST['priority'] ?? 3);
+        $due_date = $_POST['due_date'] ?? null;
+        $status = 'todo';
+        $user_id = $_SESSION['user_id'];
 
-                if ($stmt->execute()) {
-                    $success = 'Task created successfully!';
-                    // Redirect to index after 2 seconds
-                    echo '<script>
-                        setTimeout(function() {
-                            window.location.href = "index.php";
-                        }, 2000);
-                    </script>';
-                    // Clear form fields
-                    $title = '';
-                    $description = '';
-                    $priority = 3;
-                    $due_date = '';
+        // Validate input
+        if (empty($title)) {
+            $error = 'Task title is required.';
+        } elseif (strlen($title) > 255) {
+            $error = 'Task title cannot exceed 255 characters.';
+        } elseif (strlen($description) > 1000) {
+            $error = 'Task description cannot exceed 1000 characters.';
+        } elseif ($priority < 1 || $priority > 5) {
+            $error = 'Priority must be between 1 and 5.';
+        } elseif (!empty($due_date) && strtotime($due_date) === false) {
+            $error = 'Invalid due date format.';
+        } else {
+            // Verify user exists in database
+            $user_check = $conn->prepare("SELECT id FROM users WHERE id = ?");
+            $user_check->bind_param("i", $user_id);
+            $user_check->execute();
+            $user_result = $user_check->get_result();
+            
+            if ($user_result->num_rows === 0) {
+                $error = 'User not found in database. Please log in again.';
+                $user_check->close();
+            } else {
+                $user_check->close();
+                // Prepare and execute insert query
+                $stmt = $conn->prepare("INSERT INTO tasks (user_id, title, description, status, priority, due_date, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())");
+            
+                if ($stmt === false) {
+                    $error = 'Database error: ' . $conn->error;
                 } else {
-                    $error = 'Error creating task: ' . $stmt->error;
+                    $stmt->bind_param(
+                        "isssis",
+                        $user_id,
+                        $title,
+                        $description,
+                        $status,
+                        $priority,
+                        $due_date
+                    );
+
+                    if ($stmt->execute()) {
+                        $_SESSION['success'] = 'Task created successfully!';
+                     header("Location: index.php");
+                     exit;
+                    } else {
+                        $error = 'Error creating task: ' . $stmt->error;
+                    }
+                    $stmt->close();
                 }
-                $stmt->close();
             }
         }
     }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -296,6 +288,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <?php endif; ?>
 
         <form method="POST" action="">
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCSRFToken()); ?>">
             <div class="form-group">
                 <label for="title">Task Title *</label>
                 <input 
