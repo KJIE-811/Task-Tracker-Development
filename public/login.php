@@ -21,30 +21,37 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Select user query to check validation
             $select_sql = "SELECT id, name, username, password_hash FROM users WHERE username = ?";
             $stmt = $conn->prepare($select_sql);
-            $stmt->bind_param("s", $username);
-            $stmt->execute();
-            $result = $stmt->get_result();
+            
+            if ($stmt === false) {
+                $message = "Database error: " . $conn->error;
+            } else {
+                $stmt->bind_param("s", $username);
+                $stmt->execute();
+                $result = $stmt->get_result();
 
-            if ($result->num_rows == 1) {
-                $user = $result->fetch_assoc();
+                if ($result->num_rows == 1) {
+                    $user = $result->fetch_assoc();
 
-                // Verify password
-                if (password_verify($password, $user['password_hash'])) {
-                    // Store user info in session
-                    $_SESSION['user_id'] = $user['id'];
-                    $_SESSION['username'] = $user['username'];
-                    $_SESSION['name'] = $user['name'];
+                    // Verify password
+                    if (password_verify($password, $user['password_hash'])) {
+                        // Store user info in session
+                        $_SESSION['user_id'] = $user['id'];
+                        $_SESSION['username'] = $user['username'];
+                        $_SESSION['name'] = $user['name'];
 
-                    $stmt->close();
-                    header("Location: dashboard.php");
-                    exit;
+                        $stmt->close();
+                        header("Location: index.php");
+                        exit;
+                    } else {
+                        error_log("Failed login attempt: Invalid password for username '" . htmlspecialchars($username) . "'");
+                        $message = "Invalid username or password!";
+                    }
                 } else {
+                    error_log("Failed login attempt: Username '" . htmlspecialchars($username) . "' not found");
                     $message = "Invalid username or password!";
                 }
-            } else {
-                $message = "User not found!";
+                $stmt->close();
             }
-            $stmt->close();
         }
     }
 }

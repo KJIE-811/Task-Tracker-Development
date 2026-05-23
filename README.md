@@ -52,7 +52,15 @@ The project is built using the following technologies:
      git clone https://github.com/KJIE-430-XX/Task-Tracker-Development.git
      ```
 
-3. **Access the Application**
+3. **Setup Database Tables**
+   - Open your cmd and go to the folder:
+     ```
+     C:\xampp\php\php.exe database/setup.php
+     ```
+   - This will create the database and all necessary tables automatically
+   - You should see a success message confirming the database setup
+
+4. **Access the Application**
    - Open your browser and go to:
      ```
      http://localhost/Task-Tracker-Development/
