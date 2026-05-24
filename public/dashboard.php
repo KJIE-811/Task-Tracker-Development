@@ -12,37 +12,8 @@ if (!isset($_SESSION['user_id'])) {
 <html>
 <head>
     <title>Dashboard</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-        }
-        h1 {
-            text-align: center;
-        }
-        .container {
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 20px;
-            text-align: center;
-        }
-        .logout {
-            margin-top: 20px;
-        }
-        a {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #dc3545;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-        }
-        a:hover {
-            background-color: #c82333;
-        }
-    </style>
+    <link rel="stylesheet" href="assets/css/common.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
 </head>
 <body>
     <div class="container">
