@@ -42,3 +42,59 @@ h1 {
     background-color: #c82333;
     text-decoration: none;
 }
+.task-dashboard{
+    margin-top:40px;
+}
+
+.task-dashboard h2{
+    margin-bottom:20px;
+    color:#333;
+}
+
+.task-card{
+    background:white;
+    padding:20px;
+    margin-bottom:20px;
+    border-radius:15px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.08);
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    transition:0.3s;
+}
+
+.task-card:hover{
+    transform:translateY(-5px);
+}
+
+.task-info h3{
+    margin-bottom:8px;
+    color:#222;
+}
+
+.task-info p{
+    color:#777;
+    margin:0;
+}
+
+.status{
+    padding:8px 14px;
+    border-radius:20px;
+    font-size:14px;
+    font-weight:bold;
+    color:white;
+}
+
+.in-progress{
+    background:#f0ad4e;
+}
+
+.done{
+    background:#28a745;
+}
+
+.pending{
+    background:#6c757d;
+}
