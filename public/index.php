@@ -54,7 +54,7 @@ if ($isLoggedIn) {
     
     <?php if ($isLoggedIn): ?>
       <div class="welcome">
-        Welcome back, <strong><?php echo htmlspecialchars($_SESSION['name']); ?></strong>! 👋
+        Welcome back, <strong><?php echo htmlspecialchars($_SESSION['name'] ?? 'User'); ?></strong>! 👋
       </div>
       
       <div class="tasks-section">
@@ -75,24 +75,41 @@ if ($isLoggedIn) {
               <?php foreach ($tasks as $task): ?>
                 <tr>
                   <td><strong><?php echo htmlspecialchars($task['title']); ?></strong></td>
-                  <td><?php echo htmlspecialchars(substr($task['description'] ?? '', 0, 50)); ?><?php echo (strlen($task['description'] ?? '') > 50) ? '...' : ''; ?></td>
-                  <td class="priority-<?php echo htmlspecialchars((int)$task['priority'], ENT_QUOTES); ?>">
+                  <td>
+                    <?php echo htmlspecialchars(substr($task['description'] ?? '', 0, 50)); ?>
+                    <?php echo (strlen($task['description'] ?? '') > 50) ? '...' : ''; ?>
+                  </td>
+                  
+                  <td class="priority-<?php echo (int)$task['priority']; ?>">
                     <?php 
-                      $priorities = [1 => 'Low', 2 => 'Medium-Low', 3 => 'Medium', 4 => 'High', 5 => 'Critical'];
+                      $priorities = [
+                          1 => 'Lowest', 
+                          2 => 'Low', 
+                          3 => 'Medium', 
+                          4 => 'High', 
+                          5 => 'Highest'
+                      ];
                       $priorityValue = (int)$task['priority'];
-                      echo isset($priorities[$priorityValue]) ? $priorities[$priorityValue] : 'Unknown';
+                      echo htmlspecialchars($priorities[$priorityValue] ?? 'Unknown');
                     ?>
                   </td>
+                  
                   <td>
                     <?php
-                      $validStatuses = ['todo', 'in_progress', 'done'];
-                      $status = $task['status'] ?? 'todo';
-                      $statusClass = in_array($status, $validStatuses) ? str_replace('_', '-', $status) : 'todo';
+                      $statuses = [
+                          1 => ['label' => 'Todo', 'class' => 'todo'],
+                          2 => ['label' => 'In Progress', 'class' => 'in-progress'],
+                          3 => ['label' => 'Completed', 'class' => 'completed'],
+                          4 => ['label' => 'On Hold', 'class' => 'on-hold']
+                      ];
+                      $statusValue = (int)($task['status'] ?? 1);
+                      $statusInfo = $statuses[$statusValue] ?? ['label' => 'Unknown', 'class' => 'unknown'];
                     ?>
-                    <span class="status-<?php echo htmlspecialchars($statusClass, ENT_QUOTES); ?>">
-                      <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $status))); ?>
+                    <span class="status-<?php echo htmlspecialchars($statusInfo['class']); ?>">
+                      <?php echo htmlspecialchars($statusInfo['label']); ?>
                     </span>
                   </td>
+                  
                   <td><?php echo $task['due_date'] ? date('M d, Y', strtotime($task['due_date'])) : '-'; ?></td>
                   <td><?php echo date('M d, Y', strtotime($task['created_at'])); ?></td>
                 </tr>
