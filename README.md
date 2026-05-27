@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This is a web application designed to help users manage and track their tasks efficiently. Whether you're working on personal projects or collaborating with a team, this task tracker helps you organize your work, set priorities, and keep track of your progress all in one place.
+This is a web-based project management system designed to help users efficiently plan, track, and manage tasks within an internal company environment. It supports team collaboration by allowing users to create tasks, assign priorities, monitor progress, and track task status from “To Do” to “In Progress” and “Done”. This system improves workflow organization and ensures better project visibility and productivity within teams.
 
 ## Team Members
 
