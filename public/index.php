@@ -48,7 +48,7 @@ if ($isLoggedIn) {
       <h1>📋 Project Workspaces</h1>
       <div class="header-buttons">
         <?php if ($isLoggedIn): ?>
-          <a href="Pcreate.php" class="btn btn-secondary">+ New Project</a>
+          <a href="project_create.php" class="btn btn-secondary">+ New Project</a>
           <a href="logout.php" class="btn btn-danger">Logout</a>
         <?php else: ?>
           <a href="login.php" class="btn btn-primary">Login</a>
@@ -70,7 +70,7 @@ if ($isLoggedIn) {
               <div class="project-list">
                   <?php foreach($projects as $p): ?>
                       <div class="project-card">
-                          <a href="Pview.php?project_id=<?php echo $p['id']; ?>" class="project-link">
+                          <a href="project_view.php?project_id=<?php echo $p['id']; ?>" class="project-link">
                               📁 <?php echo htmlspecialchars($p['name']); ?>
                           </a>
                           <p style="font-size:13px; color:#555; margin:0; min-height:40px;">
@@ -78,13 +78,13 @@ if ($isLoggedIn) {
                               <?php echo (strlen($p['description'] ?? '') > 60) ? '...' : ''; ?>
                           </p>
                           <hr style="border:0; border-top:1px solid #ddd; margin-top:10px;">
-                          <a href="Pmanage.php?project_id=<?php echo $p['id']; ?>" class="manage-link">👥 Invite / Team Members</a>
+                          <a href="project_manage.php?project_id=<?php echo $p['id']; ?>" class="manage-link">👥 Invite / Team Members</a>
                       </div>
                   <?php endforeach; ?>
               </div>
           <?php else: ?>
               <div class="no-tasks">
-                  <p>No project workspaces found. Get started by clicking <a href="Pcreate.php">Create a Project</a>!</p>
+                  <p>No project workspaces found. Get started by clicking <a href="project_create.php">Create a Project</a>!</p>
               </div>
           <?php endif; ?>
       </div>

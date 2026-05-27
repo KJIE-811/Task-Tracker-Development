@@ -72,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             if ($stmt->execute()) {
                 $_SESSION['success'] = "Task created successfully!";
-                header("Location: Pview.php?project_id=" . $project_id);
+                header("Location: project_view.php?project_id=" . $project_id);
                 exit;
             } else {
                 $error = "Error creating task: " . $stmt->error;
@@ -149,7 +149,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
 
         <button type="submit">Create Task</button>
-        <a href="Pview.php?project_id=<?php echo $project_id; ?>" style="margin-left:15px; color:#666; text-decoration:none;">Cancel</a>
+        <a href="project_view.php?project_id=<?php echo $project_id; ?>" style="margin-left:15px; color:#666; text-decoration:none;">Cancel</a>
     </form>
 </div>
 </body>

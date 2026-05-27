@@ -44,8 +44,8 @@ $t_stmt->close();
     <div class="header">
       <h1>📁 Project Board: <?php echo htmlspecialchars($project['name']); ?></h1>
       <div class="header-buttons">
-          <a href="Pmanage.php?project_id=<?php echo $project_id; ?>" class="btn btn-secondary">👥 Team Management</a>
-          <a href="Task_create.php?project_id=<?php echo $project_id; ?>" class="btn btn-primary">+ Add Task here</a>
+          <a href="project_manage.php?project_id=<?php echo $project_id; ?>" class="btn btn-secondary">👥 Team Management</a>
+          <a href="task_create.php?project_id=<?php echo $project_id; ?>" class="btn btn-primary">+ Add Task here</a>
           <a href="index.php" class="btn btn-danger">Back to Dashboard</a>
       </div>
     </div>
@@ -106,7 +106,7 @@ $t_stmt->close();
           </table>
         <?php else: ?>
           <div class="no-tasks">
-            <p style="text-align: center; color: #666; padding: 20px;">No tasks inside this project room yet. <a href="Task_create.php?project_id=<?php echo $project_id; ?>">Create the first one!</a></p>
+            <p style="text-align: center; color: #666; padding: 20px;">No tasks inside this project room yet. <a href="task_create.php?project_id=<?php echo $project_id; ?>">Create the first one!</a></p>
           </div>
         <?php endif; ?>
     </div>
