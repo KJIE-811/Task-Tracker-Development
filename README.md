@@ -103,26 +103,23 @@ Task-Tracker-Development/
 ### Iteration 1: Week 1 (18/5 - 22/5)
 **Setup Project**
 - Create GitHub Repo
-- Download and install XAMPP
-- Document README file
-- Setup Application Structure
+- Install and configure XAMPP
+- Setup project folder structure
+- Initialize database connection
+- Prepare README documentation
 
-### Iteration 2: Week 2 (25/5 - 29/5)
+### Iteration 2: Week 2 (22/5 - 5/6)
 **CRUD Features**
-- Add, Edit, Delete Task
-- UI/UX Design
-- Testing and Bugs Fixing
-
-### Iteration 3: Week 3 (1/6 - 5/6)
-**Deployment**
-- Run Full Application to avoid bugs
+- Implement Add Task functionality
+- Implement Task List display
+- Connect frontend with backend logic
+- UI design and layout improvement
+- Basic testing and bug fixing
 
 ## Features
-**Core Feature 1**
-Task Management
+**Core Feature**
+Task Management System
 - Create Task
-- Edit Task
-- Delete Task
 - View Task List
 
 **Supporting Feature**
