@@ -5,27 +5,17 @@ include 'db.php';
 http_response_code(200);
 header('Content-Type: text/html; charset=utf-8');
 
-// Check if user is logged in
 $isLoggedIn = isset($_SESSION['user_id']);
-$tasks = [];
+$projects = [];
 
 if ($isLoggedIn) {
-    // Fetch user's tasks using prepared statement
     $user_id = $_SESSION['user_id'];
-    $stmt = $conn->prepare("SELECT * FROM tasks WHERE user_id = ? ORDER BY created_at DESC");
     
-    if ($stmt === false) {
-        error_log('Database prepare error: ' . $conn->error);
-    } else {
-        $stmt->bind_param("i", $user_id);
-        if ($stmt->execute()) {
-            $result = $stmt->get_result();
-            $tasks = $result->fetch_all(MYSQLI_ASSOC);
-        } else {
-            error_log('Query execution error: ' . $stmt->error);
-        }
-        $stmt->close();
-    }
+    $p_stmt = $conn->prepare("SELECT p.* FROM projects p JOIN project_members pm ON p.id = pm.project_id WHERE pm.user_id = ?");
+    $p_stmt->bind_param("i", $user_id);
+    $p_stmt->execute();
+    $projects = $p_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $p_stmt->close();
 }
 ?>
 <!doctype html>
@@ -33,17 +23,32 @@ if ($isLoggedIn) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Task Tracker</title>
+  <title>Project Directory</title>
   <link rel="stylesheet" href="assets/css/common.css">
   <link rel="stylesheet" href="assets/css/index.css">
+  <style>
+      .project-list { display: flex; gap: 20px; margin-top: 20px; flex-wrap: wrap;}
+      .project-card { 
+          background: #f4f6f9; 
+          padding: 20px; 
+          border-radius: 8px; 
+          border: 1px solid #ddd; 
+          width: 260px; 
+          transition: transform 0.2s;
+      }
+      .project-card:hover { transform: translateY(-5px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+      .project-link { display: block; font-size: 18px; font-weight: bold; color: #007bff; text-decoration: none; margin-bottom: 10px; }
+      .manage-link { font-size: 13px; color: #666; text-decoration: none; display: inline-block; margin-top: 10px;}
+      .manage-link:hover { color: #333; }
+  </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>📋 Task Tracker</h1>
+      <h1>📋 Project Workspaces</h1>
       <div class="header-buttons">
         <?php if ($isLoggedIn): ?>
-          <a href="task_create.php" class="btn btn-primary">+ Create Task</a>
+          <a href="Pcreate.php" class="btn btn-secondary">+ New Project</a>
           <a href="logout.php" class="btn btn-danger">Logout</a>
         <?php else: ?>
           <a href="login.php" class="btn btn-primary">Login</a>
@@ -56,80 +61,37 @@ if ($isLoggedIn) {
       <div class="welcome">
         Welcome back, <strong><?php echo htmlspecialchars($_SESSION['name'] ?? 'User'); ?></strong>! 👋
       </div>
-      
+
       <div class="tasks-section">
-        <h2>Your Tasks</h2>
-        <?php if (count($tasks) > 0): ?>
-          <table>
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Priority</th>
-                <th>Status</th>
-                <th>Due Date</th>
-                <th>Created</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php foreach ($tasks as $task): ?>
-                <tr>
-                  <td><strong><?php echo htmlspecialchars($task['title']); ?></strong></td>
-                  <td>
-                    <?php echo htmlspecialchars(substr($task['description'] ?? '', 0, 50)); ?>
-                    <?php echo (strlen($task['description'] ?? '') > 50) ? '...' : ''; ?>
-                  </td>
-                  
-                  <td class="priority-<?php echo (int)$task['priority']; ?>">
-                    <?php 
-                      $priorities = [
-                          1 => 'Lowest', 
-                          2 => 'Low', 
-                          3 => 'Medium', 
-                          4 => 'High', 
-                          5 => 'Highest'
-                      ];
-                      $priorityValue = (int)$task['priority'];
-                      echo htmlspecialchars($priorities[$priorityValue] ?? 'Unknown');
-                    ?>
-                  </td>
-                  
-                  <td>
-                    <?php
-                      $statuses = [
-                          1 => ['label' => 'Todo', 'class' => 'todo'],
-                          2 => ['label' => 'In Progress', 'class' => 'in-progress'],
-                          3 => ['label' => 'Completed', 'class' => 'completed'],
-                          4 => ['label' => 'On Hold', 'class' => 'on-hold']
-                      ];
-                      $statusValue = (int)($task['status'] ?? 1);
-                      $statusInfo = $statuses[$statusValue] ?? ['label' => 'Unknown', 'class' => 'unknown'];
-                    ?>
-                    <span class="status-<?php echo htmlspecialchars($statusInfo['class']); ?>">
-                      <?php echo htmlspecialchars($statusInfo['label']); ?>
-                    </span>
-                  </td>
-                  
-                  <td><?php echo $task['due_date'] ? date('M d, Y', strtotime($task['due_date'])) : '-'; ?></td>
-                  <td><?php echo date('M d, Y', strtotime($task['created_at'])); ?></td>
-                </tr>
-              <?php endforeach; ?>
-            </tbody>
-          </table>
-        <?php else: ?>
-          <div class="no-tasks">
-            <p>No tasks yet. <a href="task_create.php">Create your first task!</a></p>
-          </div>
-        <?php endif; ?>
+          <h2>Your Active Projects</h2>
+          <p style="color: #777;">Click on any project title below to view its specific tasks table board.</p>
+          
+          <?php if(count($projects) > 0): ?>
+              <div class="project-list">
+                  <?php foreach($projects as $p): ?>
+                      <div class="project-card">
+                          <a href="Pview.php?project_id=<?php echo $p['id']; ?>" class="project-link">
+                              📁 <?php echo htmlspecialchars($p['name']); ?>
+                          </a>
+                          <p style="font-size:13px; color:#555; margin:0; min-height:40px;">
+                              <?php echo htmlspecialchars(substr($p['description'] ?? '', 0, 60)); ?>
+                              <?php echo (strlen($p['description'] ?? '') > 60) ? '...' : ''; ?>
+                          </p>
+                          <hr style="border:0; border-top:1px solid #ddd; margin-top:10px;">
+                          <a href="Pmanage.php?project_id=<?php echo $p['id']; ?>" class="manage-link">👥 Invite / Team Members</a>
+                      </div>
+                  <?php endforeach; ?>
+              </div>
+          <?php else: ?>
+              <div class="no-tasks">
+                  <p>No project workspaces found. Get started by clicking <a href="Pcreate.php">Create a Project</a>!</p>
+              </div>
+          <?php endif; ?>
       </div>
     <?php else: ?>
       <div class="login-prompt">
-        <h2>Welcome to Task Tracker</h2>
-        <p>Please login or register to view and manage your tasks.</p>
-        <div style="display: flex; gap: 10px; justify-content: center;">
-          <a href="login.php" class="btn btn-primary" style="padding: 12px 30px; font-size: 16px;">Login</a>
-          <a href="register.php" class="btn btn-secondary" style="padding: 12px 30px; font-size: 16px;">Register</a>
-        </div>
+        <h2>Welcome to Task Tracker Workspace</h2>
+        <p>Please login or register to view and manage your projects.</p>
       </div>
     <?php endif; ?>
   </div>
