@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS projects (
   name        VARCHAR(255) NOT NULL,
   description TEXT,
   owner_id    INT NOT NULL,
+  due_date    DATE,
   created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (owner_id) REFERENCES users(id)
