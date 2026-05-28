@@ -4,7 +4,7 @@
  * This script creates the database and tables for the Task Tracker application
  * Run this script once after cloning the repository to initialize the database
  * 
- * Usage: php database/setup.php
+ * Usage: C:\xampp\php\php.exe database/setup.php
  */
 
 // Ensure this script only runs from CLI
@@ -36,6 +36,27 @@ if (!$conn->query($createDbSql)) {
 if (!$conn->select_db($database)) {
     die("Error selecting database: " . $conn->error);
 }
+
+// Drop existing tables (if they exist) to ensure fresh creation
+// Order matters due to foreign key constraints - drop dependent tables first
+$dropTablesSql = [
+    "DROP TABLE IF EXISTS task_assignees",
+    "DROP TABLE IF EXISTS task_status_history",
+    "DROP TABLE IF EXISTS tasks",
+    "DROP TABLE IF EXISTS project_members",
+    "DROP TABLE IF EXISTS projects",
+    "DROP TABLE IF EXISTS users",
+    "DROP TABLE IF EXISTS status",
+    "DROP TABLE IF EXISTS priority"
+];
+
+foreach ($dropTablesSql as $dropSql) {
+    if (!$conn->query($dropSql)) {
+        die("Error dropping tables: " . $conn->error);
+    }
+}
+
+echo "✓ Old tables cleaned up\n";
 
 // Read the schema file
 $schemaFile = __DIR__ . '/schema.sql';
