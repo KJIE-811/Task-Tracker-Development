@@ -11,6 +11,7 @@ $projects = [];
 if ($isLoggedIn) {
     $user_id = $_SESSION['user_id'];
     
+    // Safely reads assignments using the composite table joins
     $p_stmt = $conn->prepare("SELECT p.* FROM projects p JOIN project_members pm ON p.id = pm.project_id WHERE pm.user_id = ?");
     $p_stmt->bind_param("i", $user_id);
     $p_stmt->execute();
@@ -40,6 +41,7 @@ if ($isLoggedIn) {
       .project-link { display: block; font-size: 18px; font-weight: bold; color: #007bff; text-decoration: none; margin-bottom: 10px; }
       .manage-link { font-size: 13px; color: #666; text-decoration: none; display: inline-block; margin-top: 10px;}
       .manage-link:hover { color: #333; }
+      .alert-success { background: #d4edda; color: #155724; padding: 12px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #c3e6cb; }
   </style>
 </head>
 <body>
@@ -56,6 +58,15 @@ if ($isLoggedIn) {
         <?php endif; ?>
       </div>
     </div>
+    
+    <?php if (isset($_SESSION['success'])): ?>
+        <div class="alert-success">
+            <?php 
+                echo htmlspecialchars($_SESSION['success']); 
+                unset($_SESSION['success']); // Clear message after displaying
+            ?>
+        </div>
+    <?php endif; ?>
     
     <?php if ($isLoggedIn): ?>
       <div class="welcome">
