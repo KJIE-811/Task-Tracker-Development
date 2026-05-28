@@ -123,3 +123,11 @@ INSERT IGNORE INTO status (id, name, value) VALUES
   (1, 'Completed', 1),
   (2, 'To Do',     2),
   (3, 'Pending',   3);
+
+-- Default Users for Testing Purpose
+INSERT IGNORE INTO users (name, email, username, password_hash) VALUES
+  ('Alice Johnson', 'alice@example.com', 'alice', '$2y$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcg7b3XeKeUxWdeS86.bzQyQXFm'),
+  ('Bob Smith', 'bob@example.com', 'bob', '$2y$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcg7b3XeKeUxWdeS86.bzQyQXFm'),
+  ('Carol Davis', 'carol@example.com', 'carol', '$2y$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcg7b3XeKeUxWdeS86.bzQyQXFm'),
+  ('David Wilson', 'david@example.com', 'david', '$2y$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcg7b3XeKeUxWdeS86.bzQyQXFm'),
+  ('Emma Brown', 'emma@example.com', 'emma', '$2y$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcg7b3XeKeUxWdeS86.bzQyQXFm');
