@@ -109,8 +109,8 @@ Task-Tracker-Development/
 - Initialize database connection
 - Prepare README documentation
 
-### Iteration 2: Week 2 (22/5 - 5/6)
-**CRUD Features**
+### Iteration 2: Week 2 (23/5 - 5/6)
+**Create and Read Features**
 - Implement Add Project and Task functionality
 - Implement Project and Task List display
 - Connect frontend with backend logic
