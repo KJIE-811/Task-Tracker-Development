@@ -1,8 +1,9 @@
 # Task Tracker Web Application
+# Project Management System
 
 ## Purpose
 
-This is a web application designed to help users manage and track their tasks efficiently. Whether you're working on personal projects or collaborating with a team, this task tracker helps you organize your work, set priorities, and keep track of your progress all in one place.
+This project is an internal web-based project management system designed to help teams efficiently organize and manage projects within a company environment. Users first create a high-level project before creating, assigning, prioritizing, and tracking individual tasks within it. By monitoring task progress through stages such as “To Do,” “In Progress,” and “Done,” the system provides clear project visibility, enhances team collaboration, improves workflow organization, and increases overall productivity.
 
 ## Team Members
 
@@ -14,9 +15,9 @@ This is a web application designed to help users manage and track their tasks ef
 
 | Role | Team Member | Responsibilities |
 |------|-------------|------------------|
-| Product Owner & Scrum Master | CHOW KAI JIE | Identify the purpose of application, document README file, ,build the application structure, decide the languages, database and server use, plan for the iteration and guide team member about GitHub |
-| Developer 1 | CHEW SEE YUAN | Develop application function, create task, edit task, delete task |
-| Developer 2 | GUO RUNTING | Develop application UIUX, task listing |
+| Product Owner & Scrum Master | CHOW KAI JIE | Defining the application purpose, documenting the README, designing the system structure, selecting programming languages, database and server, planning development iterations, guiding the team on GitHub workflow, and contributing to ERD design and database structure decisions. |
+| Developer 1 | CHEW SEE YUAN | Develop core features including project and task creation, covering both frontend and backend. Handle linking and page redirection between modules to ensure smooth navigation and user experience. |
+| Developer 2 | GUO RUNTING | Design the application UI/UX, focusing on styling (CSS) and the task listing interface to ensure a clean, consistent, and user-friendly layout. |
 
 ## Technologies Used
 
@@ -103,27 +104,29 @@ Task-Tracker-Development/
 ### Iteration 1: Week 1 (18/5 - 22/5)
 **Setup Project**
 - Create GitHub Repo
-- Download and install XAMPP
-- Document README file
-- Setup Application Structure
+- Install and configure XAMPP
+- Setup project folder structure
+- Initialize database connection
+- Prepare README documentation
 
-### Iteration 2: Week 2 (25/5 - 29/5)
-**CRUD Features**
-- Add, Edit, Delete Task
-- UI/UX Design
-- Testing and Bugs Fixing
-
-### Iteration 3: Week 3 (1/6 - 5/6)
-**Deployment**
-- Run Full Application to avoid bugs
+### Iteration 2: Week 2 (23/5 - 5/6)
+**Create and Read Features**
+- Implement Add Project and Task functionality
+- Implement Project and Task List display
+- Connect frontend with backend logic
+- UI design and layout improvement
+- Basic testing and bug fixing
 
 ## Features
-**Core Feature 1**
-Task Management
-- Create Task
-- Edit Task
-- Delete Task
-- View Task List
+**Core Feature**
+Project Management System
+- Create and manage projects
+- Add members to project
+
+Task Management System
+- Create tasks under project
+- Set priority, status and deadline to the task
+- Assign tasks to project's member
 
 **Supporting Feature**
 User Authentication
