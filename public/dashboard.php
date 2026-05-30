@@ -24,6 +24,52 @@ if (!isset($_SESSION['user_id'])) {
         <div class="logout">
             <a href="logout.php">Logout</a>
         </div>
+        <!-- Task Dashboard Section -->
+
+<div class="task-dashboard">
+
+    <h2>My Tasks</h2>
+
+    <div class="task-card">
+
+        <div class="task-info">
+            <h3>Software Engineering Report</h3>
+            <p>Complete the reflective report documentation.</p>
+        </div>
+
+        <span class="status in-progress">
+            In Progress
+        </span>
+
+    </div>
+
+    <div class="task-card">
+
+        <div class="task-info">
+            <h3>Database Setup</h3>
+            <p>Configure MySQL database tables.</p>
+        </div>
+
+        <span class="status done">
+            Done
+        </span>
+
+    </div>
+
+    <div class="task-card">
+
+        <div class="task-info">
+            <h3>UI Design</h3>
+            <p>Improve dashboard appearance and layout.</p>
+        </div>
+
+        <span class="status pending">
+            Pending
+        </span>
+
+    </div>
+
+</div>
     </div>
 </body>
 </html>
