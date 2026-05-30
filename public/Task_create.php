@@ -37,6 +37,30 @@ if (!$project_data) {
     die("Error: Project workspace not found or you do not have permission to access it.");
 }
 
+// Fetch valid statuses and priorities from database
+$status_list = [];
+$priority_list = [];
+
+$status_stmt = $conn->prepare("SELECT id, name FROM status ORDER BY id");
+$status_stmt->execute();
+$status_result = $status_stmt->get_result();
+while ($row = $status_result->fetch_assoc()) {
+    $status_list[$row['id']] = $row['name'];
+}
+$status_stmt->close();
+
+$priority_stmt = $conn->prepare("SELECT id, name FROM priority ORDER BY id");
+$priority_stmt->execute();
+$priority_result = $priority_stmt->get_result();
+while ($row = $priority_result->fetch_assoc()) {
+    $priority_list[$row['id']] = $row['name'];
+}
+$priority_stmt->close();
+
+if (empty($status_list) || empty($priority_list)) {
+    die("Error: Status or Priority table is empty. Please contact administrator.");
+}
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $csrf_token = $_POST['csrf_token'] ?? '';
 
@@ -45,13 +69,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } else {
         $title = trim($_POST['title']);
         $description = trim($_POST['description']);
-        $priority_id = (int)($_POST['priority_id'] ?? 3); 
-        $status_id = (int)($_POST['status_id'] ?? 1);     
+        $priority_id = (int)($_POST['priority_id'] ?? 0); 
+        $status_id = (int)($_POST['status_id'] ?? 0);     
         $due_date = !empty($_POST['due_date']) ? $_POST['due_date'] : null;
 
         if (empty($title)) {
             $error = "Task title is required.";
-        } elseif (!in_array($priority_id, [1, 2, 3, 4, 5])) { 
+        } elseif (!isset($status_list[$status_id])) { 
+            $error = "Invalid status selected.";
+        } elseif (!isset($priority_list[$priority_id])) {
             $error = "Invalid priority selected.";
         } 
         // 🔥 NEW: Backend Validation Rule - Compare Task due date against Project deadline
@@ -65,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             ");
 
             $stmt->bind_param(
-                "iiissis",
+                "iissiis",
                 $user_id,
                 $project_id,
                 $title,
@@ -135,21 +161,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <div class="form-group">
             <label>Status</label>
             <select name="status_id">
-                <option value="1" selected>Todo</option>
-                <option value="2">In Progress</option>
-                <option value="3">Completed</option>
-                <option value="4">On Hold</option>
+                <?php foreach ($status_list as $id => $name): ?>
+                    <option value="<?php echo $id; ?>" <?php echo ($id === 1) ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($name); ?>
+                    </option>
+                <?php endforeach; ?>
             </select>
         </div>
 
         <div class="form-group">
             <label>Priority</label>
             <select name="priority_id">
-                <option value="1">Lowest</option>
-                <option value="2">Low</option>
-                <option value="3" selected>Medium</option>
-                <option value="4">High</option>
-                <option value="5">Highest</option>
+                <?php foreach ($priority_list as $id => $name): ?>
+                    <option value="<?php echo $id; ?>" <?php echo ($id === 3) ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($name); ?>
+                    </option>
+                <?php endforeach; ?>
             </select>
         </div>
 
