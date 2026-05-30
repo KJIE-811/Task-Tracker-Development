@@ -2,16 +2,11 @@
 session_start();
 include 'db.php';
 
-http_response_code(200);
-header('Content-Type: text/html; charset=utf-8');
-
 $isLoggedIn = isset($_SESSION['user_id']);
 $projects = [];
 
 if ($isLoggedIn) {
     $user_id = $_SESSION['user_id'];
-    
-    // Safely reads assignments using the composite table joins
     $p_stmt = $conn->prepare("SELECT p.* FROM projects p JOIN project_members pm ON p.id = pm.project_id WHERE pm.user_id = ?");
     $p_stmt->bind_param("i", $user_id);
     $p_stmt->execute();
@@ -23,34 +18,27 @@ if ($isLoggedIn) {
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Project Directory</title>
+  <title>Homepage - Project Hub</title>
   <link rel="stylesheet" href="assets/css/common.css">
   <link rel="stylesheet" href="assets/css/index.css">
   <style>
-      .project-list { display: flex; gap: 20px; margin-top: 20px; flex-wrap: wrap;}
-      .project-card { 
-          background: #f4f6f9; 
-          padding: 20px; 
-          border-radius: 8px; 
-          border: 1px solid #ddd; 
-          width: 260px; 
-          transition: transform 0.2s;
-      }
-      .project-card:hover { transform: translateY(-5px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-      .project-link { display: block; font-size: 18px; font-weight: bold; color: #007bff; text-decoration: none; margin-bottom: 10px; }
-      .manage-link { font-size: 13px; color: #666; text-decoration: none; display: inline-block; margin-top: 10px;}
-      .manage-link:hover { color: #333; }
-      .alert-success { background: #d4edda; color: #155724; padding: 12px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #c3e6cb; }
+      .header-buttons { display: flex; gap: 10px; align-items: center; }
+      .btn { padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block; }
+      .btn-primary { background: #007bff; color: white; }
+      .btn-secondary { background: #6c757d; color: white; }
+      .btn-danger { background: #dc3545; color: white; }
+      .project-list { display: flex; gap: 20px; margin-top: 20px; flex-wrap: wrap; }
+      .project-card { background: #f4f6f9; padding: 20px; border-radius: 8px; border: 1px solid #ddd; width: 260px; }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="header">
+    <div class="header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
       <h1>📋 Project Workspaces</h1>
       <div class="header-buttons">
         <?php if ($isLoggedIn): ?>
-          <a href="project_create.php" class="btn btn-secondary">+ New Project</a>
+          <a href="dashboard.php" class="btn btn-secondary">👤 My Profile Dashboard</a>
+          <a href="project_create.php" class="btn btn-primary">+ New Project</a>
           <a href="logout.php" class="btn btn-danger">Logout</a>
         <?php else: ?>
           <a href="login.php" class="btn btn-primary">Login</a>
@@ -58,51 +46,29 @@ if ($isLoggedIn) {
         <?php endif; ?>
       </div>
     </div>
-    
-    <?php if (isset($_SESSION['success'])): ?>
-        <div class="alert-success">
-            <?php 
-                echo htmlspecialchars($_SESSION['success']); 
-                unset($_SESSION['success']); // Clear message after displaying
-            ?>
-        </div>
-    <?php endif; ?>
-    
-    <?php if ($isLoggedIn): ?>
-      <div class="welcome">
-        Welcome back, <strong><?php echo htmlspecialchars($_SESSION['name'] ?? 'User'); ?></strong>! 👋
-      </div>
 
+    <?php if ($isLoggedIn): ?>
       <div class="tasks-section">
-          <h2>Your Active Projects</h2>
-          <p style="color: #777;">Click on any project title below to view its specific tasks table board.</p>
-          
+          <h2>Your Active Workspaces</h2>
           <?php if(count($projects) > 0): ?>
               <div class="project-list">
                   <?php foreach($projects as $p): ?>
                       <div class="project-card">
-                          <a href="project_view.php?project_id=<?php echo $p['id']; ?>" class="project-link">
+                          <a href="project_view.php?project_id=<?php echo $p['id']; ?>" style="font-size: 18px; font-weight: bold; color: #007bff; text-decoration: none;">
                               📁 <?php echo htmlspecialchars($p['name']); ?>
                           </a>
-                          <p style="font-size:13px; color:#555; margin:0; min-height:40px;">
-                              <?php echo htmlspecialchars(substr($p['description'] ?? '', 0, 60)); ?>
-                              <?php echo (strlen($p['description'] ?? '') > 60) ? '...' : ''; ?>
-                          </p>
-                          <hr style="border:0; border-top:1px solid #ddd; margin-top:10px;">
-                          <a href="project_manage.php?project_id=<?php echo $p['id']; ?>" class="manage-link">👥 Invite / Team Members</a>
+                          <p style="font-size:13px; color:#555; margin-top:5px;"><?php echo htmlspecialchars($p['description']); ?></p>
                       </div>
                   <?php endforeach; ?>
               </div>
           <?php else: ?>
-              <div class="no-tasks">
-                  <p>No project workspaces found. Get started by clicking <a href="project_create.php">Create a Project</a>!</p>
-              </div>
+              <p>No projects found. Create one to get started!</p>
           <?php endif; ?>
       </div>
     <?php else: ?>
-      <div class="login-prompt">
-        <h2>Welcome to Task Tracker Workspace</h2>
-        <p>Please login or register to view and manage your projects.</p>
+      <div style="text-align: center; padding: 40px; background: #f8f9fa; border-radius: 8px;">
+          <h2>Welcome to Task Tracker</h2>
+          <p>Please log in to manage your project workspaces.</p>
       </div>
     <?php endif; ?>
   </div>
