@@ -13,16 +13,17 @@ $p_stmt = $conn->prepare("SELECT * FROM projects WHERE id = ?");
 $p_stmt->bind_param("i", $project_id);
 $p_stmt->execute();
 $project = $p_stmt->get_result()->fetch_assoc();
+$p_stmt->close();
 
 if (!$project) {
     die("Workspace project channel not found.");
 }
 
-// Adjusted columns (status, priority, user_id) to seamlessly match your updated schema
+// 🔥 FIXED: Adjusted query selection to explicitly read priority_id and status_id columns
 $t_stmt = $conn->prepare("
     SELECT t.*, u.name AS creator_name 
     FROM tasks t 
-    LEFT JOIN users u ON t.user_id = u.id
+    LEFT JOIN users u ON t.created_by = u.id
     WHERE t.project_id = ? 
     ORDER BY t.created_at DESC
 ");
@@ -62,7 +63,7 @@ $t_stmt->close();
               <tr>
                 <th>Task Title</th>
                 <th>Description</th>
-                <th>Assigned To</th>
+                <th>Created By</th>
                 <th>Priority</th>
                 <th>Status</th>
                 <th>Due Date</th>
@@ -76,12 +77,12 @@ $t_stmt->close();
                     <?php echo htmlspecialchars(substr($task['description'] ?? '', 0, 60)); ?>
                     <?php echo (strlen($task['description'] ?? '') > 60) ? '...' : ''; ?>
                   </td>
-                  <td><span style="font-size:12px; color:#666;"><?php echo htmlspecialchars($task['creator_name'] ?? 'Unassigned'); ?></span></td>
+                  <td><span style="font-size:12px; color:#666;"><?php echo htmlspecialchars($task['creator_name'] ?? 'System'); ?></span></td>
                   
-                  <td class="priority-<?php echo (int)$task['priority']; ?>">
+                  <td class="priority-<?php echo (int)$task['priority_id']; ?>">
                     <?php 
                       $priorities = [1 => 'High', 2 => 'Medium', 3 => 'Low'];
-                      echo htmlspecialchars($priorities[(int)$task['priority']] ?? 'Unknown');
+                      echo htmlspecialchars($priorities[(int)$task['priority_id']] ?? 'Unknown');
                     ?>
                   </td>
                   
@@ -92,7 +93,7 @@ $t_stmt->close();
                           2 => ['label' => 'To Do', 'class' => 'todo'],
                           3 => ['label' => 'Pending', 'class' => 'pending']
                       ];
-                      $statusInfo = $statuses[(int)($task['status'] ?? 2)] ?? ['label' => 'Unknown', 'class' => 'unknown'];
+                      $statusInfo = $statuses[(int)($task['status_id'] ?? 2)] ?? ['label' => 'Unknown', 'class' => 'unknown'];
                     ?>
                     <span class="status-<?php echo htmlspecialchars($statusInfo['class']); ?>">
                       <?php echo htmlspecialchars($statusInfo['label']); ?>

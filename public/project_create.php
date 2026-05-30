@@ -18,29 +18,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } else {
         $name = trim($_POST['name']);
         $description = trim($_POST['description']);
+        // 🔥 NEW: Capture project due date from the form
+        $due_date = !empty($_POST['due_date']) ? $_POST['due_date'] : null;
         $user_id = $_SESSION['user_id'];
 
         if (empty($name)) {
             $error = "Project name is required.";
         } else {
-            // Adjusted to use your explicit column name: owner_id
-            $stmt = $conn->prepare("INSERT INTO projects (name, description, owner_id) VALUES (?, ?, ?)");
-            $stmt->bind_param("ssi", $name, $description, $user_id);
+            // 🔥 UPDATED: Added due_date to the INSERT query
+            $stmt = $conn->prepare("INSERT INTO projects (name, description, owner_id, due_date) VALUES (?, ?, ?, ?)");
+            $stmt->bind_param("ssis", $name, $description, $user_id, $due_date);
             
             if ($stmt->execute()) {
                 $project_id = $stmt->insert_id;
                 
-                // Adjusted to add creator with 'owner' role to project_members
+                // Establish creator automatically with 'owner' privileges 
                 $member_stmt = $conn->prepare("INSERT INTO project_members (project_id, user_id, role) VALUES (?, ?, 'owner')");
                 $member_stmt->bind_param("ii", $project_id, $user_id);
                 $member_stmt->execute();
+                $member_stmt->close();
                 
                 $_SESSION['success'] = "Project created successfully!";
-                header("Location: index.php");
+                header("Location: project_view.php?project_id=" . $project_id);
                 exit;
             } else {
-                $error = "Error creating project.";
+                $error = "Error creating project: " . $stmt->error;
             }
+            $stmt->close();
         }
     }
 }
@@ -68,8 +72,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <label>Description</label>
             <textarea name="description"></textarea>
         </div>
+        <div class="form-group">
+            <label>Project Due Date</label>
+            <input type="date" name="due_date">
+        </div>
         <button type="submit">Create Project & Continue</button>
-        <a href="index.php" style="margin-left: 10px; color: #666;">Cancel</a>
+        <a href="index.php" style="margin-left: 10px; color: #666; text-decoration: none;">Cancel</a>
     </form>
 </div>
 </body>
