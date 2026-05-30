@@ -25,26 +25,41 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (empty($name)) {
             $error = "Project name is required.";
         } else {
-            // 🔥 UPDATED: Added due_date to the INSERT query
-            $stmt = $conn->prepare("INSERT INTO projects (name, description, owner_id, due_date) VALUES (?, ?, ?, ?)");
-            $stmt->bind_param("ssis", $name, $description, $user_id, $due_date);
-            
-            if ($stmt->execute()) {
+            // 🔥 UPDATED: Wrap project and owner membership in a transaction
+            try {
+                $conn->begin_transaction();
+                
+                $stmt = $conn->prepare("INSERT INTO projects (name, description, owner_id, due_date) VALUES (?, ?, ?, ?)");
+                $stmt->bind_param("ssis", $name, $description, $user_id, $due_date);
+                
+                if (!$stmt->execute()) {
+                    throw new Exception("Error creating project: " . $stmt->error);
+                }
+                
                 $project_id = $stmt->insert_id;
+                $stmt->close();
                 
                 // Establish creator automatically with 'owner' privileges 
                 $member_stmt = $conn->prepare("INSERT INTO project_members (project_id, user_id, role) VALUES (?, ?, 'owner')");
                 $member_stmt->bind_param("ii", $project_id, $user_id);
-                $member_stmt->execute();
+                
+                if (!$member_stmt->execute()) {
+                    throw new Exception("Error adding owner to project members: " . $member_stmt->error);
+                }
+                
                 $member_stmt->close();
+                
+                // Commit transaction
+                $conn->commit();
                 
                 $_SESSION['success'] = "Project created successfully!";
                 header("Location: project_view.php?project_id=" . $project_id);
                 exit;
-            } else {
-                $error = "Error creating project: " . $stmt->error;
+            } catch (Exception $e) {
+                // Rollback on error
+                $conn->rollback();
+                $error = $e->getMessage();
             }
-            $stmt->close();
         }
     }
 }

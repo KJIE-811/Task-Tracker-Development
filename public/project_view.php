@@ -8,15 +8,22 @@ if (!isset($_SESSION['user_id'])) {
 include 'db.php';
 
 $project_id = (int)($_GET['project_id'] ?? 0);
+$user_id = $_SESSION['user_id'];
 
-$p_stmt = $conn->prepare("SELECT * FROM projects WHERE id = ?");
-$p_stmt->bind_param("i", $project_id);
+// 🔥 SECURITY FIX: Verify user is a member of the project before loading it
+$p_stmt = $conn->prepare("
+    SELECT p.* 
+    FROM projects p 
+    JOIN project_members pm ON p.id = pm.project_id 
+    WHERE p.id = ? AND pm.user_id = ?
+");
+$p_stmt->bind_param("ii", $project_id, $user_id);
 $p_stmt->execute();
 $project = $p_stmt->get_result()->fetch_assoc();
 $p_stmt->close();
 
 if (!$project) {
-    die("Workspace project channel not found.");
+    die("Workspace project channel not found or you do not have permission to access it.");
 }
 
 // 🔥 FIXED: Adjusted query selection to explicitly read priority_id and status_id columns

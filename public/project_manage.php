@@ -9,19 +9,25 @@ include 'db.php';
 include 'csrf.php';
 
 $project_id = (int)($_GET['project_id'] ?? 0);
+$user_id = $_SESSION['user_id'];
 
 if ($project_id === 0) {
     die("Project workspace selection required.");
 }
 
-$p_stmt = $conn->prepare("SELECT * FROM projects WHERE id = ?");
-$p_stmt->bind_param("i", $project_id);
+// 🔥 SECURITY FIX: Verify current user is the project owner before allowing management
+$p_stmt = $conn->prepare("
+    SELECT p.* 
+    FROM projects p 
+    WHERE p.id = ? AND p.owner_id = ?
+");
+$p_stmt->bind_param("ii", $project_id, $user_id);
 $p_stmt->execute();
 $project = $p_stmt->get_result()->fetch_assoc();
 $p_stmt->close();
 
 if (!$project) {
-    die("Project not found.");
+    die("Project not found or you do not have permission to manage this workspace.");
 }
 
 $error = '';
